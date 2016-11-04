@@ -1,0 +1,63 @@
+machine:
+  timezone:
+    Australia/Sydney
+  php:
+    version: 5.6.17
+  hosts:
+    localhost: 127.0.0.1
+  environment:
+    SIMPLETEST_BASE_URL: http://127.0.0.1:8888
+    SIMPLETEST_DB: mysql://ubuntu:@127.0.0.1/circle_test
+
+dependencies:
+  cache_directories:
+    - ~/.composer/cache
+    - ~/.phantomjs
+  pre:
+    # Disable Xdebug
+    - rm /opt/circleci/php/$(phpenv global)/etc/conf.d/xdebug.ini
+    - echo "date.timezone = Australia/Sydney" > /opt/circleci/php/$(phpenv global)/etc/conf.d/timezone.ini
+    # Tell composer to ignore any changes.
+    - composer config --global discard-changes true
+    - echo "memory_limit = 256M" > /opt/circleci/php/$(phpenv global)/etc/conf.d/memory.ini
+    - make phantomjs-install
+  override:
+    - make init
+    - make mkdirs
+
+  post:
+#    - make make:
+#        environment:
+#          DB_USER: ubuntu
+#          SIMPLETEST_DB: mysql://ubuntu:@localhost/circle_test
+#    - make install:
+#        environment:
+#          SIMPLETEST_DB: mysql://ubuntu:@localhost/circle_test
+#          PHP_VERSION: $(phpenv global)
+    - make phantomjs-stop
+    - make run-server:
+        background: true
+        environment:
+          LOGS_DIR: $CIRCLE_ARTIFACTS
+    - make phantomjs-start:
+        background: true
+        environment:
+          LOGS_DIR: $CIRCLE_ARTIFACTS
+
+test:
+  override:
+    - make ci-lint
+    - make ci-test:
+        environment:
+          APP_URI: http://127.0.0.1:8888
+          TYPES: "PHPUnit-Kernel"
+    - make ci-test:
+        environment:
+          APP_URI: http://127.0.0.1:8888
+          TYPES: "PHPUnit-Functional"
+    - make ci-test:
+        environment:
+          APP_URI: http://127.0.0.1:8888
+          TYPES: "PHPUnit-FunctionalJavascript"
+  post:
+    - make phantomjs-stop
