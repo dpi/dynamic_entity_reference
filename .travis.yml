@@ -99,6 +99,12 @@ before_script:
   - if [ ! -d sites/simpletest ] ; then mkdir sites/simpletest; fi;
   # Reference the module in build site.
   - ln -s $TESTDIR modules/$MODULE_NAME
+  # Install Drupal.
+  # Create new site, stubbing sendmail path with true to prevent delivery errors
+  # and manually resolving drush path.
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=$SIMPLETEST_DB testing
+  # Enable the module in build site.
+  - drush --yes pm-enable simpletest $MODULE_NAME
   # Start a web server on port 8888, run in the background; wait for
   # initialization. This is temporarly disabled since there are no web tests
   # yet.
