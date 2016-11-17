@@ -98,6 +98,7 @@ before_script:
   - drush sql-create --verbose --debug --yes --db-su=$DB_USER --db-url=$SIMPLETEST_DB
   # Create the sites/simpletest only if not exists
   - if [ ! -d sites/simpletest ] ; then mkdir sites/simpletest; fi;
+  - if [ ! -d sites/default/files ] ; then mkdir sites/default/files; fi;
   - if [ ! -d sites/default/files/simpletest ] ; then mkdir sites/default/files/simpletest; fi;
   # Reference the module in build site.
   - ln -s $TESTDIR modules/$MODULE_NAME
