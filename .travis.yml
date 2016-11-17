@@ -51,7 +51,7 @@ env:
     - DRUPAL_REPO='git://drupalcode.org/project/drupal.git'
     - DRUSH_VERSION='~8.0'
     - CODER_VERSION='~8.2'
-    - ARCH=`uname -m`
+    - ARCH=$(uname -m)
 
 before_install:
   # Disable XDebug to speed up execution.
