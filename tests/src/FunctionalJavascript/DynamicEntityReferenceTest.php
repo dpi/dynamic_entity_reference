@@ -156,36 +156,6 @@ class DynamicEntityReferenceTest extends JavascriptTestBase {
     $this->assertEquals($settings['entity_test']['handler_settings']['target_bundles'], ['entity_test' => 'entity_test']);
     $this->assertTrue($settings['entity_test']['handler_settings']['auto_create']);
     $this->assertEmpty($settings['entity_test']['handler_settings']['auto_create_bundle']);
-    $this->drupalGet('entity_test/add');
-    $autocomplete_field = $page->findField('field_foobar[0][target_id]');
-    $entity_type_field = $page->findField('field_foobar[0][target_type]');
-    // Change to user.
-    $entity_type_field->selectOption('user');
-    foreach (str_split($autocomplete_query) as $char) {
-      // Autocomplete uses keydown/up directly.
-      $autocomplete_field->keyDown($char);
-      $autocomplete_field->keyUp($char);
-    }
-    // Wait for ajax.
-    $assert_session->assertWaitOnAjaxRequest(20000);
-    // And autocomplete selection.
-    $this->assertJsCondition('jQuery(".ui-autocomplete.ui-menu li.ui-menu-item:visible").length > 0', 5000);
-    $assert_session->pageTextContains($this->anotherUser->label());
-    // Clear previous autocomplete.
-    $autocomplete_field->setValue('');
-    $autocomplete_field->keyDown(self::ESCAPE_KEY);
-    // Change to entity_test.
-    $entity_type_field->selectOption('entity_test');
-    foreach (str_split($autocomplete_query) as $char) {
-      // Autocomplete uses keydown/up directly.
-      $autocomplete_field->keyDown($char);
-      $autocomplete_field->keyUp($char);
-    }
-    // Wait for ajax.
-    $assert_session->assertWaitOnAjaxRequest(20000);
-    // And autocomplete selection.
-    $this->assertJsCondition('jQuery(".ui-autocomplete.ui-menu li.ui-menu-item:visible").length > 0', 5000);
-    $assert_session->pageTextContains($this->testEntity->label());
   }
 
   /**
@@ -264,8 +234,8 @@ class DynamicEntityReferenceTest extends JavascriptTestBase {
    * @param string $target_type
    *   The entity type id.
    *
-   * @return array
-   *   Auto complete paths for the target type.
+   * @return string
+   *   Auto complete url for the target type.
    */
   protected function createAutoCompletePath($target_type) {
     $selection_settings = [];
