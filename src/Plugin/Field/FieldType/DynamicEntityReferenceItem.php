@@ -132,6 +132,9 @@ class DynamicEntityReferenceItem extends EntityReferenceItem {
     elseif ($property_name == 'entity') {
       $this->writePropertyValue('target_type', $entity_property->getValue()->getEntityTypeId());
     }
+    elseif ($property_name == 'target_id') {
+      $entity_property->getTargetDefinition()->setEntityTypeId($this->get('target_type')->getValue());
+    }
     parent::onChange($property_name, $notify);
   }
 
